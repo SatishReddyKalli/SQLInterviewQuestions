@@ -1,1 +1,72 @@
+--In problem1.jpg you can see the Input and desired to be displayed on the screen
+
+-- let me brief you about the problem 
+
+--input we have Team1, Team2 and winner 
+
+--output we have to show the Team Name no.of matches a team played and no.of wins and no.of losses
+
+-- Here we have DDL of the above input table
+create table icc_world_cup
+(
+Team_1 Varchar(20),
+Team_2 Varchar(20),
+Winner Varchar(20)
+);
+INSERT INTO icc_world_cup values('India','SL','India');
+INSERT INTO icc_world_cup values('SL','Aus','Aus');
+INSERT INTO icc_world_cup values('SA','Eng','Eng');
+INSERT INTO icc_world_cup values('Eng','NZ','NZ');
+INSERT INTO icc_world_cup values('Aus','India','India');
+
+--solution---
+
+SELECT team_name ,count(1) as no_of_matchesplayed,sum(win_flag) as no_ofmatcheswins,COUNT(1) - sum(win_flag) as no_ofmatchelosses
+from (select team_1 as team_name,case when team_1=winner then 1 else 0 end as win_flag from icc_world_cup
+UNION ALL
+select team_2 as team_name,case when team_2=winner then 1 else 0 end as win_flag from icc_world_cup)
+group by team_name
+ORDER by no_ofmatcheswins desc
+
+we will explore step by step
+
+step1 :
+
+first select team1 and then check whether that team1 has won or not and store it another column as a flag for that we can use case when as below
+
+"case when team1=winner then 1 else 0 end " here we are storing 1 and 0 in place whether a team has won or not now we got team1 status which we combine as below
+
+"select team1 as team_name,case when team_1=winner then 1 else 0 end as win_flagfrom  icc_world_cup"
+
+
+Second , similarly we will do for team_2
+
+"select team2 as team_name,case when team_2=winner then 1 else 0 end as win_flagfrom  icc_world_cup"
+
+
+
+step3 : we will union the above two steps because we will data of teams whether they win or lose also how many matches they played as below
+select team_1 as team_name,case when team_1=winner then 1 else 0 end as win_flag from icc_world_cup
+UNION ALL
+select team_2 as team_name,case when team_2=winner then 1 else 0 end as win_flag from icc_world_cup
+
+
+
+step4 : we will select necessary data from union of two queried which gives us like no.of matches by doing count ,sum using group by
+
+select team_name,   --- team_name will give name as it is 
+count(1) as no.of matches played,--by each country by using group by
+sum(win_flag) as no.of wins, -- wins by each country by using group by with team_name
+count(1) - sum(win_flag) as no.of losses -- by subtracting we will get loss matches
+ from (
+select team_1 as team_name,case when team_1=winner then 1 else 0 end as win_flag from icc_world_cup
+UNION ALL
+select team_2 as team_name,case when team_2=winner then 1 else 0 end as win_flag from icc_world_cup
+)
+group by team_name
+
+
+
+
+
 
