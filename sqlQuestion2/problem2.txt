@@ -1,1 +1,6 @@
-
+with first_visit as (
+select customer_id,min(order_date) as first_visit_date from customer_orders GROUP by customer_id)
+SELECT co.order_date,sum(case when co.order_date=fv.first_visit_date then 1 else 0 end ) as non_repeat,
+sum(case when co.order_date!=fv.first_visit_date then 1 else 0 end) as repeated
+from customer_orders co join first_visit fv on co.customer_id=fv.customer_id
+GROUP by co.order_date
