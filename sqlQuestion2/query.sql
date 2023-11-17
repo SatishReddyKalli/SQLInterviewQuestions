@@ -12,9 +12,25 @@ values ('A','Bangalore','A@gmail.com',1,'CPU'),('A','Bangalore','A1@gmail.com',1
 
 --Question 
 --Need to find most visited floor,total_visits, resources used
+--Postgres
 with resources as (select name,count(1) as total_visits,
 				  string_agg(distinct resources,',') as resources from entries group by name),
 floor_visit as(select name,floor,count(1) as no_of_floor_visit,rank() over(
 partition by name order by count(1) desc) from entries group by name,floor)
 select t1.name,t1.total_visits,t1.resources,t2.floor as most_visited_floor
 from resources t1 join floor_visit t2 on t1.name = t2.name where rank=1 order by name
+
+
+--sql server
+
+with distinct_resource as (select distinct name, resources 
+from entries), agg_resource as (select name,string_agg(resources,',') resources from distinct_resource
+group by name),
+resources as (select name,count(1) as total_visits,
+				  string_agg(resources,',') as resources from entries group by name),
+floor_visit as(select name,floor,count(1) as no_of_floor_visit,rank() over(
+partition by name order by count(1) desc) from entries group by name,floor)
+select t1.name,t1.total_visits,t3.resources,t2.floor as most_visited_floor
+from resources t1 join floor_visit t2 on t1.name = t2.name 
+join agg_resource t3 on t1.name=t3.name
+where rank=1 order by name
